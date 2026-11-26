@@ -1,8 +1,10 @@
 # Data Model Auditor
 
-Aplicativo desktop para Windows que audita modelos de dados exportados pelo Erwin Data Modeler.
+Solução cliente-servidor para auditar modelos exportados pelo Erwin Data Modeler 12.x.
 
-Esta versão contém somente a estrutura inicial do repositório. Importação, validação, interface e histórico ainda não foram implementados.
+O cliente desktop falará com o backend somente pela API. Esta entrega contém a decisão de arquitetura, a configuração por ambiente, os contratos de severidade e perfil, o motor de validação e a casca HTTP. Ainda não há parser, interface gráfica, autenticação nem persistência.
+
+A decisão está em `docs/decisions/0001-client-server-architecture.md`.
 
 ## Estrutura
 
@@ -24,6 +26,23 @@ docs/
 ## Requisitos
 
 - Python 3.12 ou superior
+
+## Configuração
+
+Copie `.env.example` para `.env` se quiser alterar os valores locais. Segredos não entram no Git.
+
+- `APP_ENV`: `development`, `homologation` ou `production`
+- `API_HOST`
+- `API_PORT`
+- `LOG_LEVEL`
+
+## API
+
+```text
+uvicorn data_model_auditor.bootstrap.api:app --reload
+```
+
+A saúde da API fica em `GET /api/v1/health`.
 
 ## Verificação
 
