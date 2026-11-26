@@ -1,0 +1,75 @@
+---
+description: Arquitetura cliente-servidor, camadas, segurança e IA opcional
+alwaysApply: true
+---
+
+# ARCHITECTURE RULES
+
+## Arquitetura
+
+Solução desktop corporativa e multiusuário, com banco central e IA generativa opcional.
+
+- Cliente: Python e PySide6. Interface, projetos, auditorias e resultados. Comunica-se apenas por HTTPS e API REST documentada em OpenAPI.
+- Backend: Python e FastAPI. Autenticação, autorização, casos de uso, regras, auditorias e controle de acesso.
+- PostgreSQL: base central compartilhada. Não usar SQLite como banco principal. SQLite só como cache local quando a necessidade estiver comprovada.
+- Documentos: diretório central ou armazenamento de objetos. XML, Excel, PDF e Word não entram como arquivo grande no PostgreSQL sem justificativa técnica.
+- IA: provedor externo configurável, apenas para análise semântica. O núcleo da auditoria funciona sem ela.
+
+Preservar `src/data_model_auditor/` até uma reorganização autorizada. A estrutura de referência é `client/`, `server/` e `shared/`.
+
+Dentro de cada aplicação:
+
+```
+domain/
+application/
+infrastructure/
+presentation/
+bootstrap/
+```
+
+## Regras de dependência
+
+- Domain não depende de framework, interface, FastAPI, SQLAlchemy nem cliente HTTP.
+- Application depende apenas de Domain e contratos.
+- Infrastructure implementa os contratos.
+- O cliente consome a API e não acessa o PostgreSQL.
+- O backend valida permissões. Restrição só na interface não é autorização.
+- Bootstrap compõe as dependências.
+- A fronteira entre cliente e servidor são os contratos da API.
+
+## Regras de implementação
+
+- Não implementar SQL em Use Cases.
+- Não implementar regra de negócio em Widgets nem em rotas.
+- Não importar PySide6, FastAPI ou SQLAlchemy no domínio.
+- Não acoplar validadores a arquivos XML.
+- Não acoplar casos de uso a bibliotecas de leitura ou a um provedor de IA.
+- Celery e Redis só entram quando volume ou duração justificarem. Ficam fora do MVP por padrão.
+
+## Persistência e concorrência
+
+- Usar Repository Pattern. O domínio não conhece detalhes do PostgreSQL.
+- Auditoria concluída é imutável e registra o usuário e as referências usadas.
+- Usar transações. Avaliar versionamento otimista em entidades editáveis.
+- Rastrear quem cadastrou, alterou ou aprovou uma regra de modelagem.
+- Proteger alterações simultâneas.
+
+## Perfis
+
+- Administrador: gerenciamento geral, usuários e configurações.
+- Analista: importação, configuração e execução de auditorias.
+- Consulta: visualização de projetos e resultados.
+
+## IA opcional
+
+- Usar Strategy e Adapter para trocar o provedor sem alterar o domínio.
+- Usos permitidos: qualidade semântica, ambiguidade, descrição incompatível com a finalidade do campo, sugestão de redação e interpretação assistida de PDF.
+- Validação determinística não depende de IA.
+- A IA não aprova nem ativa regra normativa.
+- Antes de enviar conteúdo a uma API externa, informar o usuário, obter autorização e enviar só o trecho necessário.
+- Credenciais do provedor ficam protegidas no backend.
+- Indisponibilidade da IA não interrompe a auditoria.
+
+## Evolução
+
+Estender contratos existentes. Evitar alterar componente estável para um comportamento específico.

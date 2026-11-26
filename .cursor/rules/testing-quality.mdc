@@ -1,0 +1,67 @@
+---
+description: Diretrizes de testes automatizados e qualidade
+alwaysApply: true
+---
+
+# TESTING AND QUALITY RULES
+
+Utilizar pytest.
+
+Organizar testes em:
+
+```
+tests/
+  unit/
+  integration/
+  acceptance/
+  fixtures/
+```
+
+## Testes obrigatórios
+
+Criar testes para:
+
+- Entidades.
+- Casos de uso.
+- Validadores.
+- Leitores de arquivos.
+- Repositórios.
+- Histórico.
+- Comparação entre auditorias.
+- API, autenticação, autorização e perfis.
+- Upload e controle de acesso a documentos.
+- Concorrência e integridade do histórico.
+- XML do Erwin 12.x com tabelas, nomes físicos e lógicos, PK, FK, índices, defaults, tipos, relacionamentos, descrições e nulabilidade.
+- Auditoria com o provedor de IA indisponível.
+
+## Regras de testes
+
+- Testes devem ser independentes.
+- Não depender de arquivos pessoais do desenvolvedor.
+- Utilizar fixtures controladas.
+- Não utilizar dados reais sensíveis.
+- Testar casos positivos e negativos.
+- Testar limites e erros.
+- Criar testes de regressão para defeitos corrigidos.
+
+## Cobertura
+
+Meta de 90% no domínio e 80% geral.
+
+Cobertura não substitui qualidade dos testes.
+
+## Antes de concluir uma tarefa
+
+Executar:
+
+```
+pytest
+ruff check .
+mypy src/
+```
+
+Quando `client/` e `server/` existirem, incluir esses pacotes no mypy.
+
+Verificar o resultado dos comandos.
+
+Não afirmar que os testes passaram sem executá-los.

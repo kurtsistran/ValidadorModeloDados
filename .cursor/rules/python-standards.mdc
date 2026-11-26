@@ -1,0 +1,57 @@
+---
+description: Padrões de implementação Python
+alwaysApply: true
+---
+
+# PYTHON DEVELOPMENT STANDARDS
+
+- Seguir PEP 8.
+- Utilizar Python 3.12 ou superior, respeitando a versão configurada no projeto.
+- Utilizar type hints.
+- Preferir dataclasses para estruturas simples de domínio quando apropriado.
+- Utilizar Pydantic para validação de estruturas externas.
+- Utilizar enums para valores controlados.
+- Utilizar pathlib para caminhos.
+- Utilizar logging.
+- Evitar print em produção.
+- Não registrar senhas, tokens ou conteúdo confidencial de documentos.
+- Utilizar context managers para recursos externos.
+- Tratar exceções de forma específica.
+- Evitar funções extensas.
+- Evitar classes com múltiplas responsabilidades.
+- Evitar dependências circulares.
+- Evitar importações desnecessárias.
+- Evitar valores mágicos.
+- Utilizar constantes quando apropriado.
+- Não utilizar `Any` indiscriminadamente.
+- Não utilizar atributos públicos mutáveis sem necessidade.
+
+## Nomenclatura
+
+- Classes: PascalCase.
+- Métodos e funções: snake_case.
+- Variáveis: snake_case.
+- Constantes: UPPER_SNAKE_CASE.
+- Módulos: snake_case.
+
+## Documentação
+
+Adicionar docstrings nas interfaces públicas e componentes importantes.
+
+Documentar decisões não óbvias.
+
+## Qualidade
+
+Executar Ruff e mypy.
+
+Não suprimir alertas sem justificativa.
+
+## Dependências
+
+Antes de adicionar uma biblioteca:
+
+- Verificar se existe alternativa já instalada.
+- Avaliar manutenção da biblioteca.
+- Avaliar compatibilidade com Python.
+- Avaliar segurança.
+- Registrar a justificativa técnica.

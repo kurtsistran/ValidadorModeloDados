@@ -1,0 +1,86 @@
+---
+description: Processo de desenvolvimento, GitHub e gerenciamento de tarefas
+alwaysApply: true
+---
+
+# GITHUB WORKFLOW
+
+O projeto utiliza um repositório GitHub já existente.
+
+Nunca criar outro repositório sem autorização.
+
+## Antes de implementar
+
+- Verificar Issues existentes.
+- Verificar o GitHub Project.
+- Verificar Milestones.
+- Verificar branches.
+- Verificar Pull Requests.
+- Identificar tarefas relacionadas.
+
+## Prioridades
+
+- P0: indispensável para o MVP.
+- P1: importante para a primeira versão.
+- P2: evolução futura.
+
+## Kanban
+
+Utilizar:
+
+- Backlog.
+- Ready.
+- In Progress.
+- In Review.
+- Done.
+
+## Milestones
+
+- M0: Fundação e arquitetura.
+- M1: Interface e projetos.
+- M2: Importação e interpretação.
+- M3: Nomenclatura e motor de regras.
+- M4: Validação estrutural.
+- M5: Documentação Word.
+- M6: Regras PDF.
+- M7: Histórico e auditoria.
+- M8: Testes e distribuição.
+
+## Issues
+
+Cada Issue deverá possuir:
+
+- Objetivo.
+- Contexto.
+- Descrição técnica.
+- Critérios de aceite.
+- Prioridade.
+- Dependências.
+- Milestone.
+- Labels.
+
+## Branches
+
+Preferir:
+
+- `feature/nome-da-funcionalidade`
+- `bugfix/nome-do-defeito`
+- `refactor/nome-do-modulo`
+
+## Commits
+
+Utilizar Conventional Commits.
+
+## Pull Requests
+
+Toda alteração relevante deverá estar associada a uma Issue.
+
+A PR deverá conter:
+
+- Objetivo.
+- Resumo técnico.
+- Testes executados.
+- Evidências quando aplicável.
+- Issue relacionada.
+
+Não mover tarefas para Done sem verificar os critérios de aceite.

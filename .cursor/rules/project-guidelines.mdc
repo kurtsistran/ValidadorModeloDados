@@ -1,0 +1,503 @@
+---
+description: Diretrizes gerais obrigatórias do projeto Data Model Auditor
+alwaysApply: true
+---
+
+# DATA MODEL AUDITOR — PROJECT GUIDELINES
+
+## 1. CONTEXTO DO PROJETO
+
+Você está trabalhando no projeto Data Model Auditor.
+
+O objetivo é desenvolver uma solução desktop corporativa e multiusuário para auditoria de modelos exportados pelo Erwin Data Modeler 12.x. O cliente Windows usa PySide6 e se comunica com um backend FastAPI por HTTPS. O PostgreSQL é o banco central. A IA generativa é opcional e não integra o núcleo determinístico.
+
+O sistema deverá importar arquivos XML do Erwin e confrontá-los com documentos de referência:
+
+- Planilhas Excel ou CSV contendo termos permitidos.
+- Planilhas Excel ou CSV contendo prefixos permitidos.
+- Documento PDF contendo regras de modelagem.
+- Documento Word contendo a documentação funcional dos campos.
+
+O sistema deverá identificar inconsistências de nomenclatura, estrutura, tipos de dados, descrições, relacionamentos e documentação.
+
+A aplicação deverá apresentar os resultados em uma interface gráfica, permitindo consultar inconsistências, justificativas, regras violadas, sugestões de correção e severidades.
+
+O sistema também deverá manter histórico das auditorias realizadas.
+
+## 2. PRINCÍPIOS OBRIGATÓRIOS
+
+Toda implementação deverá respeitar:
+
+- Clean Code.
+- SOLID.
+- DRY.
+- KISS.
+- Separation of Concerns.
+- Clean Architecture.
+- Hexagonal Architecture.
+- Dependency Injection.
+- Desenvolvimento orientado a testes quando aplicável.
+- Código legível, modular e de fácil manutenção.
+
+Não implementar funcionalidades apenas para cumprir formalmente um padrão de projeto.
+
+Utilizar abstrações quando houver benefício real para manutenção, testabilidade ou extensibilidade.
+
+Evitar acoplamento entre interface gráfica, API, regras de negócio, persistência, autenticação e leitura de arquivos.
+
+## 3. TECNOLOGIAS
+
+Utilizar preferencialmente:
+
+- Python 3.12 ou superior.
+- PySide6 para o cliente desktop.
+- FastAPI para o backend.
+- REST e OpenAPI para o contrato da API.
+- PostgreSQL como banco central.
+- SQLAlchemy 2.x para ORM.
+- Alembic para migrations.
+- OAuth2 e OpenID Connect para autenticação.
+- HTTPS para a comunicação.
+- Pydantic para contratos e validação de estruturas.
+- Diretório central ou armazenamento de objetos para os documentos.
+- Provedor externo de IA configurável, sem torná-lo obrigatório.
+- Celery e Redis apenas quando o processamento distribuído for necessário.
+- lxml para processamento XML.
+- defusedxml para proteção na leitura de XML não confiável.
+- pandas e openpyxl para planilhas.
+- python-docx para documentos Word.
+- PyMuPDF para documentos PDF.
+- pytest para testes.
+- pytest-cov para cobertura.
+- Ruff para lint e formatação.
+- mypy para análise estática.
+- PyInstaller para distribuição.
+- GitHub Actions para CI/CD.
+
+Antes de adicionar qualquer dependência, verificar se ela já existe no projeto.
+
+Não adicionar bibliotecas sem justificativa técnica.
+
+Manter dependências e versões documentadas no `pyproject.toml` e arquivo de lock.
+
+## 4. ARQUITETURA
+
+Utilizar arquitetura cliente-servidor com Clean Architecture e arquitetura hexagonal. O cliente não acessa o PostgreSQL. SQLite não é o banco principal.
+
+Organizar as responsabilidades em:
+
+### Domain
+
+Contém:
+
+- Entidades.
+- Value Objects.
+- Regras de negócio.
+- Contratos.
+- Interfaces.
+- Validadores.
+- Exceções de domínio.
+
+Não deve depender de frameworks externos ou interface gráfica.
+
+### Application
+
+Contém:
+
+- Use Cases.
+- Serviços de aplicação.
+- DTOs.
+- Orquestração dos processos.
+- Interfaces de serviços.
+
+### Infrastructure
+
+Contém:
+
+- Repositórios concretos.
+- Persistência PostgreSQL.
+- SQLAlchemy.
+- API REST.
+- Autenticação e autorização.
+- Leitores de XML.
+- Leitores de Excel.
+- Leitores de CSV.
+- Leitores de PDF.
+- Leitores de Word.
+- Logs.
+- Integrações externas.
+
+### Presentation
+
+Contém:
+
+- Interface PySide6.
+- Janelas.
+- Widgets.
+- Dialogs.
+- ViewModels ou modelos de apresentação.
+- Gerenciamento de eventos.
+
+### Bootstrap
+
+Responsável pela inicialização da aplicação e composição das dependências.
+
+A direção das dependências deverá respeitar a Clean Architecture.
+
+## 5. PADRÕES DE PROJETO
+
+Utilizar quando apropriado:
+
+- Strategy: validadores independentes e provedores de IA.
+- Factory: seleção dos leitores de arquivos.
+- Adapter: formatos externos e provedores de IA.
+- Repository: persistência.
+- Dependency Injection: composição das dependências.
+- Specification: regras de validação.
+- DTO: transferência de dados entre camadas.
+- Observer e Signals & Slots: comunicação entre componentes da interface.
+
+Não criar padrões desnecessários.
+
+## 6. PADRÕES DE CÓDIGO PYTHON
+
+- Escrever código em inglês.
+- Utilizar nomes claros e objetivos.
+- Utilizar type hints.
+- Utilizar docstrings nos componentes públicos.
+- Seguir PEP 8.
+- Preferir composição à herança quando apropriado.
+- Evitar métodos extensos.
+- Evitar classes com múltiplas responsabilidades.
+- Evitar variáveis globais.
+- Evitar lógica de negócio na interface.
+- Evitar consultas SQL diretamente nos componentes gráficos.
+- Evitar captura genérica de exceções sem tratamento adequado.
+- Não utilizar valores mágicos.
+- Centralizar configurações.
+- Utilizar logging em vez de print para registros técnicos.
+
+## 7. DOMÍNIO DO SISTEMA
+
+O sistema deverá possuir módulos independentes para:
+
+- Importação de modelos Erwin.
+- Interpretação do XML.
+- Importação de nomenclaturas.
+- Importação de prefixos.
+- Importação de regras PDF.
+- Importação de documentação Word.
+- Motor de validação.
+- Validação de nomenclatura.
+- Validação de prefixos.
+- Validação de tabelas.
+- Validação de campos.
+- Validação de tipos de dados.
+- Validação de descrições.
+- Validação de PK.
+- Validação de FK.
+- Validação de DEFAULT.
+- Validação de INDEX.
+- Comparação XML versus Word.
+- Histórico de auditorias.
+- Comparação entre auditorias.
+- Usuários, perfis e permissões.
+- Registro de atividades.
+
+Cada módulo deverá possuir responsabilidade bem definida.
+
+## 8. MOTOR DE REGRAS
+
+O motor de validação deverá ser independente da interface gráfica.
+
+Cada regra deverá possuir, quando aplicável:
+
+- Código.
+- Nome.
+- Categoria.
+- Descrição.
+- Condição.
+- Severidade.
+- Mensagem.
+- Justificativa.
+- Sugestão de correção.
+- Fonte normativa.
+- Versão.
+- Status.
+
+Os validadores deverão possuir contratos padronizados.
+
+Adicionar novos validadores não deverá exigir modificações nos validadores existentes.
+
+Não implementar regras normativas sem fonte ou aprovação.
+
+As regras extraídas de PDFs deverão passar por revisão humana antes de serem ativadas.
+
+A IA poderá avaliar qualidade semântica, ambiguidade, aderência da descrição à finalidade do campo, sugerir redação e auxiliar a interpretação do PDF. A validação determinística não depende dela. A IA não aprova nem ativa regras. Antes de enviar conteúdo a uma API externa, informar o usuário, obter autorização e enviar só o trecho necessário. Credenciais do provedor ficam no backend. Sem provedor, a auditoria continua.
+
+## 9. TRATAMENTO DE ARQUIVOS
+
+Os arquivos originais nunca deverão ser modificados.
+
+Validar:
+
+- Extensão.
+- Conteúdo.
+- Estrutura.
+- Tamanho.
+- Integridade.
+- Compatibilidade.
+
+Implementar tratamento de erros de leitura.
+
+Não presumir estruturas de XML sem um export real do Erwin Data Modeler 12.x.
+
+O parser deverá permanecer desacoplado das regras de negócio e adaptável a versões futuras do Erwin.
+
+Criar testes com tabelas, atributos, nomes físicos e lógicos, PK, FK, índices, defaults, tipos, relacionamentos, descrições e nulabilidade.
+
+Guardar os originais em armazenamento central, associados ao projeto e à versão, com hash SHA-256.
+
+Não executar macros ou código proveniente dos documentos importados.
+
+Proteger o processamento XML contra XXE e entidades externas.
+
+## 10. INTERFACE GRÁFICA
+
+Utilizar PySide6.
+
+A interface deverá ser profissional, intuitiva e consistente.
+
+O processamento da auditoria ocorre no backend. A interface acompanha status e progresso e não bloqueia durante importações ou auditorias.
+
+A interface não decide permissão. O backend autoriza cada operação.
+
+Utilizar:
+
+- Barra de progresso.
+- Mensagens de sucesso.
+- Mensagens de erro.
+- Confirmações para operações destrutivas.
+- Filtros.
+- Tabelas de resultados.
+- Navegação consistente.
+
+A interface não deverá conter regras de negócio.
+
+## 11. PERSISTÊNCIA E HISTÓRICO
+
+Utilizar PostgreSQL e SQLAlchemy. Não usar SQLite como banco principal.
+
+Utilizar Alembic para migrations.
+
+Manter histórico imutável das auditorias e registrar o usuário que executou cada uma.
+
+Cada execução deverá preservar:
+
+- Projeto.
+- XML utilizado.
+- Hash dos arquivos.
+- Data e hora.
+- Versões das referências.
+- Versão das regras.
+- Resultados.
+- Inconsistências.
+- Severidades.
+
+Permitir comparar execuções anteriores.
+
+Identificar:
+
+- Inconsistências novas.
+- Inconsistências corrigidas.
+- Inconsistências persistentes.
+
+Não alterar auditorias antigas quando referências ou regras forem modificadas.
+
+## 12. SEGURANÇA
+
+- Não executar conteúdo proveniente dos documentos.
+- Não permitir execução de código extraído de PDF ou Word.
+- Validar arquivos importados.
+- Proteger o parser XML.
+- Evitar exposição desnecessária de dados nos logs.
+- Não armazenar senhas em código.
+- Não incluir credenciais no Git.
+- Não sobrescrever documentos originais.
+- Implementar tratamento adequado de exceções.
+- Não armazenar senhas em texto puro.
+- Validar permissões no backend.
+- Usar HTTPS e separar configuração de desenvolvimento, homologação e produção.
+- Não registrar senhas, tokens ou documentos confidenciais nos logs.
+- Informar o usuário e obter autorização antes de enviar conteúdo a uma IA externa.
+
+## 13. TESTES
+
+Utilizar pytest.
+
+Criar:
+
+- Testes unitários.
+- Testes de integração.
+- Testes de aceitação.
+- Fixtures de arquivos.
+- Testes de regressão.
+
+Cobertura desejada:
+
+- 90% para o domínio.
+- 80% para o projeto como um todo.
+
+Não criar testes artificiais apenas para aumentar cobertura.
+
+Testar especialmente:
+
+- Interpretação XML.
+- Regras de nomenclatura.
+- Prefixos.
+- Tipos de dados.
+- PK e FK.
+- Defaults.
+- Índices.
+- Comparação XML versus Word.
+- Versionamento das regras.
+- Imutabilidade do histórico.
+- Autenticação, autorização e perfis.
+- Concorrência e autoria da auditoria.
+- Indisponibilidade do provedor de IA.
+
+## 14. QUALIDADE DE CÓDIGO
+
+Executar:
+
+- Ruff.
+- Mypy.
+- Pytest.
+- Pytest-cov.
+
+Corrigir problemas antes de considerar uma tarefa concluída.
+
+Não ignorar erros de tipagem sem justificativa documentada.
+
+Não utilizar `noqa` ou `type: ignore` indiscriminadamente.
+
+## 15. GITHUB E VERSIONAMENTO
+
+O projeto utilizará um repositório GitHub existente, fornecido pelo responsável.
+
+Não criar outro repositório.
+
+Preservar:
+
+- Histórico.
+- Branches.
+- Arquivos.
+- Configurações.
+- Workflows existentes.
+
+Utilizar:
+
+- Issues.
+- GitHub Projects.
+- Milestones.
+- Pull Requests.
+- Labels.
+
+Manter o Kanban com:
+
+- Backlog.
+- Ready.
+- In Progress.
+- In Review.
+- Done.
+
+Priorizar tarefas:
+
+- P0: indispensáveis.
+- P1: importantes.
+- P2: evolutivas.
+
+Utilizar Conventional Commits.
+
+Exemplos:
+
+- `feat: implement erwin xml parser`
+- `fix: correct naming validation`
+- `test: add validator integration tests`
+- `refactor: decouple validation engine`
+- `docs: update architecture documentation`
+
+Não marcar tarefas como concluídas sem implementação, testes e critérios de aceite atendidos.
+
+## 16. DOCUMENTAÇÃO
+
+Manter atualizados:
+
+- `README.md`.
+- `CHANGELOG.md`.
+- Documentação arquitetural.
+- Requisitos.
+- Guia de instalação.
+- Guia do usuário.
+- Guia de desenvolvimento.
+- Documentação do banco.
+- Documentação do motor de regras.
+- ADRs.
+
+Documentar decisões arquiteturais importantes.
+
+## 17. PROCESSO DE DESENVOLVIMENTO
+
+Antes de implementar qualquer funcionalidade:
+
+1. Analisar a estrutura existente.
+2. Identificar o módulo envolvido.
+3. Consultar as regras arquiteturais.
+4. Identificar dependências.
+5. Verificar Issues relacionadas.
+6. Planejar a implementação.
+7. Implementar de forma incremental.
+8. Criar ou atualizar testes.
+9. Executar verificações de qualidade.
+10. Atualizar documentação quando necessário.
+
+Não implementar grandes funcionalidades em uma única alteração.
+
+Preferir pequenas entregas independentes.
+
+Não duplicar funcionalidades já existentes.
+
+## 18. COMPORTAMENTO DO AGENTE
+
+Atue como engenheiro de software responsável pela qualidade do produto.
+
+Antes de tomar decisões arquiteturais relevantes, explique a justificativa.
+
+Quando houver ambiguidade que possa comprometer a implementação, solicite esclarecimento.
+
+Não invente requisitos.
+
+Não invente estruturas de arquivos.
+
+Não invente regras de negócio.
+
+Não simule funcionalidades concluídas.
+
+Se uma integração externa não estiver disponível, informe claramente.
+
+Sempre priorize qualidade, manutenção, segurança e evolução do sistema.
+
+## 19. CRITÉRIO FINAL
+
+Toda implementação deverá produzir código:
+
+- Funcional.
+- Testável.
+- Documentado.
+- Modular.
+- Tipado.
+- Seguro.
+- Compatível com a arquitetura.
+- Preparado para manutenção.
+
+O objetivo não é apenas produzir código rapidamente, mas construir um produto profissional e sustentável.
