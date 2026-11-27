@@ -27,3 +27,9 @@ class ValidationFinding:
     correction_suggestion: str
     source: str
     rule_version: str
+    subject_area: str = ""
+    table_name: str = ""
+    physical_field_name: str = ""
+    logical_field_name: str = ""
+    validation_type: str = ""
+    normative_page: int | None = None
