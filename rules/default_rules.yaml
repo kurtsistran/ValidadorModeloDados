@@ -1,0 +1,77 @@
+# Regras de produto do MVP V1. O texto do PDF normativo não entra aqui.
+# Uma regra extraída de PDF só pode ser acrescentada depois de aprovação humana.
+version: "1.0"
+rules:
+  - code: NAME-001
+    name: Composição por termos do thesaurus
+    category: naming
+    enabled: true
+    severity: high
+    normative_source: "MVP V1 specification, section 10.1"
+    required_reference: thesaurus
+    parameters: {}
+  - code: PREF-001
+    name: Prefixo conforme a planilha de classes
+    category: prefix
+    enabled: true
+    severity: high
+    normative_source: "MVP V1 specification, section 10.2"
+    required_reference: thesaurus
+    parameters: {}
+  - code: TABLE-001
+    name: Convenções da tabela
+    category: table
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.3"
+    required_reference: none
+    parameters: {}
+  - code: PK-001
+    name: Chave primária quando obrigatória
+    category: primary_key
+    enabled: true
+    severity: high
+    normative_source: "MVP V1 specification, section 10.4"
+    required_reference: none
+    parameters:
+      require_primary_key: true
+  - code: FK-001
+    name: Chave estrangeira e relacionamento
+    category: foreign_key
+    enabled: true
+    severity: high
+    normative_source: "MVP V1 specification, section 10.5"
+    required_reference: none
+    parameters: {}
+  - code: TYPE-001
+    name: Tipo compatível com o banco de destino
+    category: data_type
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.6"
+    required_reference: none
+    parameters: {}
+  - code: DEF-001
+    name: Default obrigatório e compatível
+    category: default
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.7"
+    required_reference: none
+    parameters: {}
+  - code: IDX-001
+    name: Índice, composição e unicidade
+    category: index
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.8"
+    required_reference: none
+    parameters: {}
+  - code: DESC-001
+    name: Descrição confrontada com o SM077
+    category: description
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.9"
+    required_reference: sm077
+    parameters: {}
