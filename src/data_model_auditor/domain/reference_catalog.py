@@ -83,3 +83,20 @@ class EntitySpecification:
 
     fields: tuple[LabeledValue, ...]
     columns: tuple[DocumentedColumn, ...]
+
+
+@dataclass(frozen=True)
+class PdfPageText:
+    """Text extracted from one PDF page. It is not an approved rule."""
+
+    number: int
+    text: str
+
+
+@dataclass(frozen=True)
+class PdfExtraction:
+    """Text of a modeling standard kept inactive until a person approves rules."""
+
+    sha256: str
+    pages: tuple[PdfPageText, ...]
+    rules_active: bool = False
