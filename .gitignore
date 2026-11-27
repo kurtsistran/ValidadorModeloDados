@@ -1,5 +1,6 @@
 .env
 .venv/
+.build-venv/
 local_references/
 docs/Exemplos arquivos/
 __pycache__/
