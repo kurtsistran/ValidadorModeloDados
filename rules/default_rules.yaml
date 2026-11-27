@@ -9,7 +9,9 @@ rules:
     severity: high
     normative_source: "MVP V1 specification, section 10.1"
     required_reference: thesaurus
-    parameters: {}
+    parameters:
+      physical_separator: "_"
+      logical_separator: " "
   - code: PREF-001
     name: Prefixo conforme a planilha de classes
     category: prefix

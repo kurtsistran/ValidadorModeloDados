@@ -50,7 +50,7 @@ class _RuleEntry(BaseModel):
         for name, parameter in value.items():
             if not isinstance(parameter, _SCALAR) or isinstance(parameter, float):
                 raise ValueError(f"{name} must be text, an integer, or a boolean")
-            if isinstance(parameter, str) and not parameter.strip():
+            if isinstance(parameter, str) and parameter == "":
                 raise ValueError(f"{name} must not be blank")
         return value
 
