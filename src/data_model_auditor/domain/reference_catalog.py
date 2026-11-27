@@ -55,3 +55,31 @@ class ThesaurusCatalog:
 
     entries: tuple[ThesaurusEntry, ...]
     name_classes: tuple[NameClass, ...]
+
+
+@dataclass(frozen=True)
+class DocumentedColumn:
+    """A column described in an SM077 entity specification."""
+
+    operation: str
+    logical_name: str
+    physical_name: str
+    data_type: str
+    nullable: bool | None
+    observations: str
+
+
+@dataclass(frozen=True)
+class LabeledValue:
+    """A label and the adjacent value found in the specification."""
+
+    label: str
+    value: str
+
+
+@dataclass(frozen=True)
+class EntitySpecification:
+    """Entity definition read from an SM077 Word document."""
+
+    fields: tuple[LabeledValue, ...]
+    columns: tuple[DocumentedColumn, ...]
