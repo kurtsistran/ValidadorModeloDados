@@ -14,6 +14,9 @@ class ModelColumn:
     physical_data_type: str
     nullable: bool | None
     definition: str
+    default_value: str = ""
+    parent_attribute_id: str = ""
+    parent_relationship_id: str = ""
 
 
 @dataclass(frozen=True)
@@ -35,6 +38,7 @@ class KeyGroup:
     physical_name: str
     key_group_type: str
     members: tuple[KeyMember, ...]
+    is_unique: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -87,6 +91,14 @@ class LogicalDataModel:
     def table_by_id(self) -> dict[str, ModelTable]:
         """Index tables by the identifier used inside the export."""
         return {table.origin_id: table for table in self.tables}
+
+    def column_owner_by_id(self) -> dict[str, tuple[ModelTable, ModelColumn]]:
+        """Index every column with the table that owns it."""
+        return {
+            column.origin_id: (table, column)
+            for table in self.tables
+            for column in table.columns
+        }
 
 
 def key_group_kind(key_group_type: str) -> str:

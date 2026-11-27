@@ -69,6 +69,14 @@ _EXPORT = """<?xml version="1.0" encoding="UTF-8"?>
               <Null_Option_Type>1</Null_Option_Type>
               <Definition>Identifier</Definition>
             </AttributeProps>
+            <Default_Constraint_Usage_Groups>
+              <Default_Constraint_Usage id="d1">
+                <Default_Constraint_UsageProps>
+                  <Name>DF_CUSTOMER_ID</Name>
+                  <Server_Value>('0')</Server_Value>
+                </Default_Constraint_UsageProps>
+              </Default_Constraint_Usage>
+            </Default_Constraint_Usage_Groups>
           </Attribute>
           <Attribute id="c2">
             <AttributeProps>
@@ -86,6 +94,7 @@ _EXPORT = """<?xml version="1.0" encoding="UTF-8"?>
               <Physical_Name>PK_CUSTOMER</Physical_Name>
               <Long_Id>pk1</Long_Id>
               <Key_Group_Type>PK</Key_Group_Type>
+              <Is_Unique>true</Is_Unique>
             </Key_GroupProps>
             <Key_Group_Member_Groups>
               <Key_Group_Member id="m1">
@@ -106,6 +115,17 @@ _EXPORT = """<?xml version="1.0" encoding="UTF-8"?>
           <Physical_Name>ORDER</Physical_Name>
           <Long_Id>order</Long_Id>
         </EntityProps>
+        <Attribute_Groups>
+          <Attribute id="o1">
+            <AttributeProps>
+              <Name>Customer Id</Name>
+              <Physical_Name>CUSTOMER_ID</Physical_Name>
+              <Long_Id>o1</Long_Id>
+              <Parent_Attribute_Ref>c1</Parent_Attribute_Ref>
+              <Parent_Relationship_Ref>r1</Parent_Relationship_Ref>
+            </AttributeProps>
+          </Attribute>
+        </Attribute_Groups>
       </Entity>
     </Entity_Groups>
     <Relationship_Groups>
@@ -138,6 +158,12 @@ def test_repository_export_keeps_names_keys_and_subject_areas(tmp_path: Path) ->
     assert customer.columns[1].nullable is True
     assert key_group_kind(customer.key_groups[0].key_group_type) == "primary"
     assert customer.key_groups[0].members[0].attribute_id == "c1"
+    assert customer.key_groups[0].is_unique is True
+    assert customer.columns[0].default_value == "('0')"
+    assert customer.columns[1].default_value == ""
+    migrated = model.tables[1].columns[0]
+    assert migrated.parent_attribute_id == "c1"
+    assert migrated.parent_relationship_id == "r1"
     assert model.relationships[0].child_entity_id == "order"
     sales = select_audit_scope(model, "Sales")
     billing = select_audit_scope(model, "Billing")

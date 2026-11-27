@@ -41,7 +41,7 @@ def test_default_catalog_keeps_version_severity_and_source() -> None:
     primary_key = next(rule for rule in catalog.rules if rule.code == "PK-001")
 
     assert catalog.version == "1.0"
-    assert len(catalog.rules) == 9
+    assert len(catalog.rules) == 10
     assert naming.severity is Severity.HIGH
     assert naming.required_reference is RequiredReference.THESAURUS
     assert naming.normative_source.startswith("MVP V1 specification")

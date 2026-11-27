@@ -38,6 +38,8 @@ _PROPS_OF = {
     "Key_Group_MemberProps": "Key_Group_Member",
     "RelationshipProps": "Relationship",
 }
+_DEFAULT_USAGE_PROPS = "Default_Constraint_UsageProps"
+_DEFAULT_VALUE = "_Default_Server_Value"
 
 
 class ErwinXmlError(Exception):
@@ -135,6 +137,10 @@ class _RepositoryReader:
         area = self._current("Subject_Area")
         if local == "User_Attached_Objects_Ref" and text and area is not None:
             area.member_refs.append(text)
+        if parent == _DEFAULT_USAGE_PROPS and local == "Server_Value":
+            attribute = self._current("Attribute")
+            if attribute is not None:
+                attribute.props[_DEFAULT_VALUE] = text
         if local not in _OBJECTS or not self._stack or self._stack[-1].kind != local:
             return
         self._finish(self._stack.pop())
@@ -223,6 +229,9 @@ def _column(node: _Node) -> ModelColumn:
         physical_data_type=node.props.get("Physical_Data_Type", ""),
         nullable=_nullable(node.props.get("Null_Option_Type", "")),
         definition=node.props.get("Definition", ""),
+        default_value=node.props.get(_DEFAULT_VALUE, ""),
+        parent_attribute_id=node.props.get("Parent_Attribute_Ref", ""),
+        parent_relationship_id=node.props.get("Parent_Relationship_Ref", ""),
     )
 
 
@@ -233,7 +242,17 @@ def _key_group(node: _Node) -> KeyGroup:
         physical_name=node.props.get("Physical_Name", ""),
         key_group_type=node.props.get("Key_Group_Type", ""),
         members=tuple(_member(item) for item in node.members),
+        is_unique=_flag(node.props.get("Is_Unique", "")),
     )
+
+
+def _flag(value: str) -> bool | None:
+    lowered = value.casefold()
+    if lowered == "true":
+        return True
+    if lowered == "false":
+        return False
+    return None
 
 
 def _member(node: _Node) -> KeyMember:

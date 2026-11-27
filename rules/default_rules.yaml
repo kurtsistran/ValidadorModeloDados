@@ -1,5 +1,9 @@
 # Regras de produto do MVP V1. O texto do PDF normativo não entra aqui.
 # Uma regra extraída de PDF só pode ser acrescentada depois de aprovação humana.
+#
+# As listas de tipos seguem a documentação de cada fabricante.
+# Separadores, posição do prefixo e tipos com tamanho obrigatório são
+# parâmetros do produto. Revise-os antes de usar o resultado como norma.
 version: "1.0"
 rules:
   - code: NAME-001
@@ -7,7 +11,7 @@ rules:
     category: naming
     enabled: true
     severity: high
-    normative_source: "MVP V1 specification, section 10.1"
+    normative_source: "MVP V1 specification, section 10.1; thesaurus spreadsheet"
     required_reference: thesaurus
     parameters:
       physical_separator: "_"
@@ -17,11 +21,13 @@ rules:
     category: prefix
     enabled: true
     severity: high
-    normative_source: "MVP V1 specification, section 10.2"
+    normative_source: "MVP V1 specification, section 10.2; name-class sheet"
     required_reference: thesaurus
-    parameters: {}
+    parameters:
+      separator: "_"
+      position: first
   - code: TABLE-001
-    name: Convenções da tabela
+    name: Tabela com nome físico e colunas
     category: table
     enabled: true
     severity: medium
@@ -29,7 +35,7 @@ rules:
     required_reference: none
     parameters: {}
   - code: PK-001
-    name: Chave primária quando obrigatória
+    name: Chave primária existente, composta e não nula
     category: primary_key
     enabled: true
     severity: high
@@ -38,7 +44,7 @@ rules:
     parameters:
       require_primary_key: true
   - code: FK-001
-    name: Chave estrangeira e relacionamento
+    name: Chave estrangeira com origem existente e mesmo tipo
     category: foreign_key
     enabled: true
     severity: high
@@ -50,19 +56,38 @@ rules:
     category: data_type
     enabled: true
     severity: medium
-    normative_source: "MVP V1 specification, section 10.6"
+    normative_source: "MVP V1 specification, section 10.6; vendor type documentation"
     required_reference: none
-    parameters: {}
+    parameters:
+      sqlserver_types: >-
+        BIGINT,BINARY,BIT,CHAR,CHARACTER,DATE,DATETIME,DATETIME2,DATETIMEOFFSET,DEC,
+        DECIMAL,FLOAT,GEOGRAPHY,GEOMETRY,HIERARCHYID,IMAGE,INT,INTEGER,MONEY,NCHAR,
+        NTEXT,NUMERIC,NVARCHAR,REAL,ROWVERSION,SMALLDATETIME,SMALLINT,SMALLMONEY,
+        SQL_VARIANT,TEXT,TIME,TIMESTAMP,TINYINT,UNIQUEIDENTIFIER,VARBINARY,VARCHAR,XML
+      oracle_types: >-
+        BFILE,BINARY_DOUBLE,BINARY_FLOAT,BLOB,CHAR,CLOB,DATE,DECIMAL,FLOAT,INT,
+        INTEGER,LONG,NCHAR,NCLOB,NUMBER,NUMERIC,NVARCHAR2,RAW,ROWID,SMALLINT,
+        TIMESTAMP,UROWID,VARCHAR,VARCHAR2,XMLTYPE
+      postgresql_types: >-
+        BIGINT,BIGSERIAL,BOOL,BOOLEAN,BYTEA,CHAR,CHARACTER,CHARACTER VARYING,DATE,
+        DECIMAL,DOUBLE PRECISION,FLOAT4,FLOAT8,INT,INT2,INT4,INT8,INTEGER,INTERVAL,
+        JSON,JSONB,MONEY,NUMERIC,REAL,SERIAL,SMALLINT,SMALLSERIAL,TEXT,TIME,TIMESTAMP,
+        TIMESTAMPTZ,TIMETZ,UUID,VARCHAR,XML
+      length_required_types: "BINARY,CHAR,NCHAR,NVARCHAR,NVARCHAR2,RAW,VARBINARY,VARCHAR,VARCHAR2"
+      precision_scale_types: "DEC,DECIMAL,NUMBER,NUMERIC"
   - code: DEF-001
-    name: Default obrigatório e compatível
+    name: Default compatível com tipo e nulidade
     category: default
     enabled: true
     severity: medium
     normative_source: "MVP V1 specification, section 10.7"
     required_reference: none
-    parameters: {}
+    parameters:
+      numeric_types: >-
+        BIGINT,BIT,DEC,DECIMAL,FLOAT,INT,INTEGER,MONEY,NUMBER,NUMERIC,REAL,
+        SMALLINT,SMALLMONEY,TINYINT
   - code: IDX-001
-    name: Índice, composição e unicidade
+    name: Índice com colunas, único quando alternativo e sem duplicidade
     category: index
     enabled: true
     severity: medium
@@ -70,10 +95,20 @@ rules:
     required_reference: none
     parameters: {}
   - code: DESC-001
-    name: Descrição confrontada com o SM077
+    name: Tabela e coluna com descrição
     category: description
     enabled: true
     severity: medium
     normative_source: "MVP V1 specification, section 10.9"
-    required_reference: sm077
+    required_reference: none
     parameters: {}
+  - code: DESC-002
+    name: Entidade e colunas confrontadas com o SM077
+    category: description
+    enabled: true
+    severity: medium
+    normative_source: "MVP V1 specification, section 10.9; SM077 specification"
+    required_reference: sm077
+    parameters:
+      entity_label: "NOME DA ENTIDADE"
+      report_undocumented_xml_columns: true
