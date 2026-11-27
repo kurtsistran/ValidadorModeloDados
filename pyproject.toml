@@ -15,6 +15,7 @@ dependencies = [
     "pandas>=2.2",
     "pydantic>=2.10",
     "pymupdf>=1.24,<2",
+    "pyside6-essentials>=6.10,<7",
     "python-docx>=1.1",
     "pyyaml>=6",
     "uvicorn>=0.32",
@@ -34,6 +35,12 @@ dev = [
     "types-openpyxl>=3.1",
     "types-pyyaml>=6",
 ]
+packaging = [
+    "pyinstaller>=6.10",
+]
+
+[project.gui-scripts]
+data-model-auditor = "data_model_auditor.bootstrap.desktop:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
