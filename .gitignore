@@ -1,6 +1,7 @@
 .env
 .venv/
 local_references/
+docs/Exemplos arquivos/
 __pycache__/
 *.py[cod]
 .pytest_cache/
