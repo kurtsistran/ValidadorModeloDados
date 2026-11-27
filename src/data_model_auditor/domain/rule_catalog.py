@@ -101,6 +101,15 @@ def set_category_enabled(
     return RuleCatalog(version=catalog.version, rules=updated)
 
 
+def set_rule_enabled(catalog: RuleCatalog, code: str, *, enabled: bool) -> RuleCatalog:
+    """Return a catalog where the rule ``code`` has the given state."""
+    updated = tuple(
+        _replace_enabled(rule, enabled) if rule.code == code else rule
+        for rule in catalog.rules
+    )
+    return RuleCatalog(version=catalog.version, rules=updated)
+
+
 def plan_rule_run(
     catalog: RuleCatalog,
     available_references: frozenset[RequiredReference],

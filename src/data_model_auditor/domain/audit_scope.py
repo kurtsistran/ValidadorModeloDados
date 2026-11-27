@@ -34,22 +34,39 @@ class ColumnOutsideSelectionError(SubjectAreaSelectionError):
     """A selected column is not part of the tables in scope."""
 
 
+AUDITED = "audited"
+STRUCTURAL_DEPENDENCY = "structural_dependency"
+
+
 @dataclass(frozen=True)
 class ScopedColumn:
     """A column included in the audit."""
 
     table_id: str
     column: ModelColumn
-    role: str = "audited"
+    role: str = AUDITED
 
 
 @dataclass(frozen=True)
 class AuditScope:
-    """Tables and columns that participate in one audit run."""
+    """Tables and columns that participate in one audit run.
+
+    ``structural_tables`` are consulted by key checks but are not audited.
+    ``model`` lets validators resolve references outside the selection.
+    """
 
     subject_area: SubjectArea
     tables: tuple[ModelTable, ...]
     columns: tuple[ScopedColumn, ...]
+    structural_tables: tuple[ModelTable, ...] = ()
+    model: LogicalDataModel | None = None
+
+    def table_name(self, table_id: str) -> str:
+        """Return the physical name of an audited or structural table."""
+        for table in (*self.tables, *self.structural_tables):
+            if table.origin_id == table_id:
+                return table.physical_name
+        return ""
 
 
 def select_audit_scope(
@@ -72,7 +89,31 @@ def select_audit_scope(
     tables = _tables_in_area(model, area)
     selected_tables = _selected_tables(tables, table_ids or ())
     selected_columns = _selected_columns(selected_tables, column_ids or ())
-    return AuditScope(subject_area=area, tables=selected_tables, columns=selected_columns)
+    return AuditScope(
+        subject_area=area,
+        tables=selected_tables,
+        columns=selected_columns,
+        structural_tables=_structural_tables(model, selected_tables),
+        model=model,
+    )
+
+
+def _structural_tables(
+    model: LogicalDataModel,
+    selected: tuple[ModelTable, ...],
+) -> tuple[ModelTable, ...]:
+    """Parent tables of selected children that the selection left out."""
+    selected_ids = {table.origin_id for table in selected}
+    tables = model.table_by_id()
+    found: dict[str, ModelTable] = {}
+    for relationship in model.relationships:
+        parent_id = relationship.parent_entity_id
+        if relationship.child_entity_id not in selected_ids or parent_id in selected_ids:
+            continue
+        parent = tables.get(parent_id)
+        if parent is not None:
+            found.setdefault(parent_id, parent)
+    return tuple(found.values())
 
 
 def _find_area(model: LogicalDataModel, name: str) -> SubjectArea:
