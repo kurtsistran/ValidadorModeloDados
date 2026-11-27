@@ -1,0 +1,114 @@
+"""Tests for the reference-document readers."""
+
+from pathlib import Path
+
+import pytest
+import xlwt
+from openpyxl import Workbook
+
+from data_model_auditor.domain.reference_catalog import NameClassColumns, ThesaurusColumns
+from data_model_auditor.infrastructure.readers.tabular import (
+    SpreadsheetLayoutError,
+    read_thesaurus,
+)
+
+
+def test_xls_reader_uses_the_supplied_template_headers(tmp_path: Path) -> None:
+    """The term and name-class sheets are discovered by their headers."""
+    path = tmp_path / "thesaurus.xls"
+    workbook = xlwt.Workbook()
+    terms = workbook.add_sheet("thesaurus")
+    for column, header in enumerate(("Termo", "Mnemônico", "Termo Preterido", "Pret. Mnemônico")):
+        terms.write(0, column, header)
+    terms.write(1, 0, "CLIENTE\xa0")
+    terms.write(1, 1, "CLI \xa0")
+    terms.write(2, 0, "ABATIDO")
+    terms.write(2, 2, "DESCONTADO")
+    terms.write(2, 3, "DESCD")
+    classes = workbook.add_sheet("numenclatura")
+    for column, header in enumerate(("Código", "Nome", "Nome Abrev", "Nome Codif", "Descrição")):
+        classes.write(0, column, header)
+    classes.write(1, 0, 1)
+    classes.write(1, 1, "CÓDIGO")
+    classes.write(1, 2, "CD")
+    classes.write(1, 3, "C")
+    classes.write(1, 4, "Identificador")
+    workbook.save(path)
+
+    catalog = read_thesaurus(path)
+
+    assert catalog.entries[0].term == "CLIENTE"
+    assert catalog.entries[0].mnemonic == "CLI"
+    assert catalog.entries[1].deprecated_mnemonic == "DESCD"
+    assert catalog.name_classes[0].abbreviation == "CD"
+    assert catalog.name_classes[0].code == "1"
+
+
+def test_xlsx_accepts_an_explicit_column_map(tmp_path: Path) -> None:
+    """A spreadsheet with other headers is read only after the columns are mapped."""
+    path = tmp_path / "terms.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    assert sheet is not None
+    sheet.title = "terms"
+    sheet.append(["word", "short", "old", "old_short"])
+    sheet.append(["CONTA", "CTA", "", ""])
+    classes = workbook.create_sheet("classes")
+    classes.append(["id", "title", "prefix", "letter", "meaning"])
+    classes.append(["2", "DATA", "DT", "D", "Tempo"])
+    workbook.save(path)
+
+    with pytest.raises(SpreadsheetLayoutError):
+        read_thesaurus(path)
+
+    catalog = read_thesaurus(
+        path,
+        term_columns=ThesaurusColumns(
+            term="word",
+            mnemonic="short",
+            deprecated_term="old",
+            deprecated_mnemonic="old_short",
+        ),
+        class_columns=NameClassColumns(
+            code="id",
+            name="title",
+            abbreviation="prefix",
+            coded_name="letter",
+            description="meaning",
+        ),
+    )
+
+    assert catalog.entries[0].mnemonic == "CTA"
+    assert catalog.name_classes[0].abbreviation == "DT"
+
+
+def test_csv_uses_the_same_column_contract(tmp_path: Path) -> None:
+    """CSV rows use the same term and name-class columns as the workbook."""
+    path = tmp_path / "terms.csv"
+    header = (
+        "Termo,Mnemônico,Termo Preterido,Pret. Mnemônico,"
+        "Código,Nome,Nome Abrev,Nome Codif,Descrição"
+    )
+    path.write_text(
+        f"{header}\nCONTA,CTA,,,,,,,\n,,,,2,DATA,DT,D,Tempo\n",
+        encoding="utf-8",
+    )
+
+    catalog = read_thesaurus(path)
+
+    assert catalog.entries[0].mnemonic == "CTA"
+    assert catalog.name_classes[0].abbreviation == "DT"
+
+
+def test_spreadsheet_rejects_missing_empty_and_unknown_files(tmp_path: Path) -> None:
+    """A missing, empty, or unsupported spreadsheet becomes a layout error."""
+    with pytest.raises(SpreadsheetLayoutError):
+        read_thesaurus(tmp_path / "missing.xls")
+    for name in ("empty.xls", "empty.xlsx", "empty.csv"):
+        (tmp_path / name).write_bytes(b"")
+        with pytest.raises(SpreadsheetLayoutError):
+            read_thesaurus(tmp_path / name)
+    (tmp_path / "notes.txt").write_text("not a spreadsheet", encoding="utf-8")
+    with pytest.raises(SpreadsheetLayoutError):
+        read_thesaurus(tmp_path / "notes.txt")
+
