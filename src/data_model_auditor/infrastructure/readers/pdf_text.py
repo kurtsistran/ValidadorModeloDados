@@ -3,7 +3,7 @@
 from hashlib import sha256
 from pathlib import Path
 
-import pymupdf
+import pymupdf  # type: ignore[import-untyped, unused-ignore]
 
 from data_model_auditor.domain.reference_catalog import PdfExtraction, PdfPageText
 
@@ -38,15 +38,15 @@ def extract_pdf_text(path: Path) -> PdfExtraction:
 
 def _page_texts(payload: bytes) -> tuple[PdfPageText, ...]:
     # PyMuPDF does not publish type stubs, so this boundary stays local.
-    document = pymupdf.open(stream=payload, filetype="pdf")  # type: ignore[no-untyped-call]
+    document = pymupdf.open(stream=payload, filetype="pdf")  # type: ignore[no-untyped-call, unused-ignore]
     try:
         if bool(document.is_encrypted) and bool(document.needs_pass):
             raise PdfReadError("Encrypted PDFs are not accepted.")
         page_count = int(document.page_count)
         pages: list[PdfPageText] = []
         for index in range(page_count):
-            page = document.load_page(index)  # type: ignore[no-untyped-call]
+            page = document.load_page(index)  # type: ignore[no-untyped-call, unused-ignore]
             pages.append(PdfPageText(number=index + 1, text=str(page.get_text("text"))))
         return tuple(pages)
     finally:
-        document.close()  # type: ignore[no-untyped-call]
+        document.close()  # type: ignore[no-untyped-call, unused-ignore]
